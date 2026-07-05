@@ -15,5 +15,5 @@ COPY . .
 
 EXPOSE 8000
 
-# Run with uvicorn in production mode (no reload)
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Use $PORT for Railway dynamic port assignment
+CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}
