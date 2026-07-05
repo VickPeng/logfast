@@ -1,3 +1,5 @@
+import re
+
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy.pool import NullPool
 from app.config import settings
@@ -7,12 +9,11 @@ from app.models import Base
 def _async_db_url(url: str) -> str:
     """Ensure the database URL uses the asyncpg driver for async engines.
 
-    Railway injects DATABASE_URL as 'postgresql://...' but create_async_engine
-    requires 'postgresql+asyncpg://...'. Auto-fix if the scheme is missing the driver.
+    Railway injects DATABASE_URL as 'postgresql://...' (sync scheme), but
+    create_async_engine requires 'postgresql+asyncpg://...'. This also handles
+    'postgresql+psycopg://' and similar variants.
     """
-    if url.startswith("postgresql://") and "+" not in url.split("://")[0]:
-        return url.replace("postgresql://", "postgresql+asyncpg://", 1)
-    return url
+    return re.sub(r"^postgresql(?:\+[^+]+)?://", "postgresql+asyncpg://", url)
 
 
 # Use psycopg_async driver (avoids PgBouncer + asyncpg prepared statement cache conflict)
