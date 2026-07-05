@@ -11,8 +11,11 @@ def _async_db_url(url: str) -> str:
 
     Railway injects DATABASE_URL as 'postgresql://...' (sync scheme), but
     create_async_engine requires 'postgresql+asyncpg://...'. This also handles
-    'postgresql+psycopg://' and similar variants.
+    'postgresql+psycopg://' and similar variants, and converts 'sslmode'
+    query param to 'ssl' (asyncpg uses 'ssl' not 'sslmode').
     """
+    # asyncpg's connect() expects 'ssl' not 'sslmode' as a query parameter
+    url = re.sub(r"sslmode=([^&]+)", r"ssl=\1", url)
     return re.sub(r"^postgresql(?:\+[^+]+)?://", "postgresql+asyncpg://", url)
 
 
