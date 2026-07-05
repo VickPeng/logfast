@@ -2,7 +2,7 @@
 GitHub OAuth authentication routes.
 """
 import secrets
-from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi import APIRouter, HTTPException, Depends, Query, Request
 from fastapi.responses import RedirectResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -32,10 +32,12 @@ class UserResponse(BaseModel):
 
 
 @router.get("/login")
-async def login():
+async def login(request: Request):
     """Redirect user to GitHub OAuth."""
     state = secrets.token_urlsafe(16)
-    url = get_oauth_url(state)
+    # Derive redirect_uri from the request itself so it works in both dev and prod
+    redirect_uri = str(request.base_url).rstrip("/") + "/api/auth/github/callback"
+    url = get_oauth_url(state, redirect_uri=redirect_uri)
     # Store state in a cookie or cache in production
     # For MVP, we just redirect
     return RedirectResponse(url=url)
@@ -45,13 +47,16 @@ async def login():
 async def github_callback(
     code: str = Query(...),
     state: str = Query(None),
+    request: Request = None,
     db: AsyncSession = Depends(get_db),
 ):
     """Handle GitHub OAuth callback."""
     import traceback
     try:
+        redirect_uri = str(request.base_url).rstrip("/") if request else settings.api_base_url + "/api/auth/github/callback"
+
         # Exchange code for token
-        token_data = await exchange_code(code)
+        token_data = await exchange_code(code, redirect_uri=redirect_uri)
         if not token_data or "access_token" not in token_data:
             raise HTTPException(status_code=400, detail="Failed to exchange code")
 

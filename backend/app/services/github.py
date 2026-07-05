@@ -15,21 +15,25 @@ GITHUB_API = "https://api.github.com"
 GITHUB_OAUTH = "https://github.com/login/oauth"
 
 
-def get_oauth_url(state: str = None) -> str:
+def get_oauth_url(state: str = None, redirect_uri: str = None) -> str:
     """Generate GitHub OAuth authorization URL."""
     if state is None:
         state = secrets.token_urlsafe(16)
+    if redirect_uri is None:
+        redirect_uri = f"{settings.api_base_url}/api/auth/github/callback"
     return (
         f"{GITHUB_OAUTH}/authorize"
         f"?client_id={settings.github_client_id}"
-        f"&redirect_uri={settings.api_base_url}/api/auth/github/callback"
+        f"&redirect_uri={redirect_uri}"
         f"&scope=repo,user:email"
         f"&state={state}"
     )
 
 
-async def exchange_code(code: str) -> Optional[dict]:
+async def exchange_code(code: str, redirect_uri: str = None) -> Optional[dict]:
     """Exchange OAuth code for access token."""
+    if redirect_uri is None:
+        redirect_uri = f"{settings.api_base_url}/api/auth/github/callback"
     async with httpx.AsyncClient() as client:
         resp = await client.post(
             f"{GITHUB_OAUTH}/access_token",
@@ -37,7 +41,7 @@ async def exchange_code(code: str) -> Optional[dict]:
                 "client_id": settings.github_client_id,
                 "client_secret": settings.github_client_secret,
                 "code": code,
-                "redirect_uri": f"{settings.api_base_url}/api/auth/github/callback",
+                "redirect_uri": redirect_uri,
             },
             headers={"Accept": "application/json"},
         )
