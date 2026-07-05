@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="256" fill="#0F172A"/>
+  <circle cx="256" cy="256" r="240" fill="#0D1F17"/>
+  
+  <!-- Lightning bolt (representing "fast/automated") -->
+  <path d="M280 100 L180 270 L240 270 L210 420 L340 230 L275 230 L310 100Z" 
+        fill="#22C55E" opacity="0.9"/>
+  
+  <!-- Document/changelog icon base -->
+  <rect x="150" y="180" width="220" height="240" rx="16" fill="#1E293B" transform="rotate(-8, 260, 300)"/>
+  <rect x="160" y="195" width="200" height="220" rx="12" fill="#0F172A" transform="rotate(-8, 260, 300)"/>
+  
+  <!-- Text lines on changelog -->
+  <rect x="175" y="220" width="140" height="10" rx="5" fill="#334155" transform="rotate(-8, 260, 300)"/>
+  <rect x="175" y="245" width="170" height="10" rx="5" fill="#334155" transform="rotate(-8, 260, 300)"/>
+  <rect x="175" y="270" width="120" height="10" rx="5" fill="#334155" transform="rotate(-8, 260, 300)"/>
+  <rect x="175" y="300" width="160" height="10" rx="5" fill="#1E293B" transform="rotate(-8, 260, 300)"/>
+  <rect x="175" y="325" width="130" height="10" rx="5" fill="#1E293B" transform="rotate(-8, 260, 300)"/>
+  <rect x="175" y="350" width="145" height="10" rx="5" fill="#1E293B" transform="rotate(-8, 260, 300)"/>
+  
+  <!-- Green accent lines -->
+  <rect x="175" y="270" width="40" height="10" rx="5" fill="#22C55E" transform="rotate(-8, 260, 300)"/>
+  
+  <!-- Sparkle top-right -->
+  <circle cx="330" cy="180" r="4" fill="#4ADE80"/>
+  <circle cx="348" cy="165" r="3" fill="#22C55E"/>
+  <circle cx="340" cy="195" r="2.5" fill="#86EFAC"/>
+</svg>

@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.gradient-text {
+  @apply bg-gradient-to-r from-brand-500 to-emerald-400 bg-clip-text text-transparent;
+}
