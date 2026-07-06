@@ -22,6 +22,7 @@ engine = create_async_engine(
     _async_db_url(settings.database_url),
     echo=False,
     poolclass=NullPool,
+    connect_args={"prepared_statement_cache_size": 0, "statement_cache_size": 0},
 )
 async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
