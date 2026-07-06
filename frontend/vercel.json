@@ -4,8 +4,8 @@
   "framework": "vite",
   "rewrites": [
     {
-      "source": "/api/:match*",
-      "destination": "https://exquisite-reprieve-logfast.up.railway.app/api/:match*"
+      "source": "/api/(.*)",
+      "destination": "https://exquisite-reprieve-logfast.up.railway.app/api/$1"
     }
   ]
 }
