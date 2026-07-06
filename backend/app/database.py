@@ -11,12 +11,17 @@ def _async_db_url(url: str) -> str:
 
     Railway injects DATABASE_URL as 'postgresql://...' (sync scheme), but
     create_async_engine requires 'postgresql+asyncpg://...'. This also handles
-    'postgresql+psycopg://' and similar variants, and converts 'sslmode'
-    query param to 'ssl' (asyncpg uses 'ssl' not 'sslmode').
+    'postgresql+psycopg://' and similar variants, converts 'sslmode'
+    query param to 'ssl', and disables prepared statement cache for PgBouncer.
     """
     # asyncpg's connect() expects 'ssl' not 'sslmode' as a query parameter
     url = re.sub(r"sslmode=([^&]+)", r"ssl=\1", url)
-    return re.sub(r"^postgresql(?:\+[^+]+)?://", "postgresql+asyncpg://", url)
+    # Ensure asyncpg driver
+    url = re.sub(r"^postgresql(?:\+[^+]+)?://", "postgresql+asyncpg://", url)
+    # Disable prepared statement cache for PgBouncer compatibility
+    if "statement_cache_size" not in url:
+        url += ("&" if "?" in url else "?") + "statement_cache_size=0"
+    return url
 
 
 # Use psycopg_async driver (avoids PgBouncer + asyncpg prepared statement cache conflict)
