@@ -7,29 +7,21 @@ from app.models import Base
 
 
 def _async_db_url(url: str) -> str:
-    """Ensure the database URL uses the asyncpg driver for async engines.
+    """Ensure the database URL uses the psycopg async driver.
 
     Railway injects DATABASE_URL as 'postgresql://...' (sync scheme), but
-    create_async_engine requires 'postgresql+asyncpg://...'. This also handles
-    'postgresql+psycopg://' and similar variants, converts 'sslmode'
-    query param to 'ssl', and disables prepared statement cache for PgBouncer.
+    create_async_engine requires 'postgresql+psycopg://...' for psycopg 3's
+    async mode. psycopg 3 handles PgBouncer gracefully (no prepared statement
+    cache conflict like asyncpg).
     """
-    # asyncpg's connect() expects 'ssl' not 'sslmode' as a query parameter
-    url = re.sub(r"sslmode=([^&]+)", r"ssl=\1", url)
-    # Ensure asyncpg driver
-    url = re.sub(r"^postgresql(?:\+[^+]+)?://", "postgresql+asyncpg://", url)
-    # Disable prepared statement cache for PgBouncer compatibility
-    if "statement_cache_size" not in url:
-        url += ("&" if "?" in url else "?") + "statement_cache_size=0"
-    return url
+    # psycopg supports sslmode natively, no need to convert
+    return re.sub(r"^postgresql(?:\+[^+]+)?://", "postgresql+psycopg://", url)
 
 
-# Use psycopg_async driver (avoids PgBouncer + asyncpg prepared statement cache conflict)
 engine = create_async_engine(
     _async_db_url(settings.database_url),
     echo=False,
     poolclass=NullPool,
-    connect_args={"statement_cache_size": 0},
 )
 async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
